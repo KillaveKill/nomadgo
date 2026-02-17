@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NomadGo | Гид по Кыргызстану</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', 'Noto Sans', sans-serif;
+    }
+
+    body {
+      overflow-x: hidden;
+      background: #0a192f;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    section {
+      min-height: 100vh;
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      position: relative;
+      transition: opacity 0.5s ease;
+      overflow-y: auto;
+    }
+
+    .active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Орнаменты */
+    .ornament-top, .ornament-bottom {
+      width: 100%;
+      height: 30px;
+      background-repeat: repeat-x;
+      position: absolute;
+      left: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .ornament-top {
+      top: 0;
+      background-image: url("img/sverhu.png");
+    }
+
+    .ornament-bottom {
+      bottom: 0;
+      background-image: url("img/sverhu.png");
+    }
+
+    /* Главная */
+#home {
+  background: url('img/Img_fon.png') center/cover no-repeat;
+  background-attachment: fixed; /* фиксирует фон при прокрутке */
+  min-height: 100vh; /* на всю высоту экрана */
+}
+
+    #home::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 25, 47, 0.3);
+    }
+
+    .hero-container {
+      display: flex;
+      align-items: center;
+      gap: 3rem;
+      max-width: 1200px;
+      width: 100%;
+      z-index: 2;
+      margin-top: 4rem;
+      position: relative;
+    }
+
+    .boy-img {
+      flex: 1;
+      max-width: 400px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .boy-img img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .text-bubble {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 20px;
+      padding: 2.5rem;
+      border: 3px solid rgba(255, 255, 255, 0.8);
+      color: #0a192f;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .text-bubble h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      background: #d32f2f;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      display: inline-block;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .text-bubble p {
+      font-size: 1.15rem;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    /* КАРТА - НОВОЕ ПОЗИЦИОНИРОВАНИЕ */
+    #map {
+      background: url('img/Img_fon.png') center/cover no-repeat;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #map::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 25, 47, 0.2);
+    }
+
+    .levels-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      z-index: 2;
+    }
+
+    .level-card {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border: 5px solid #1a6dcc;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      position: absolute;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+      z-index: 2;
+    }
+
+    .level-card:hover:not(.locked) {
+      transform: scale(1.2) rotate(5deg);
+      box-shadow: 0 12px 35px rgba(26, 109, 204, 0.6);
+      z-index: 10;
+    }
+
+    .level-icon {
+      width: 75px;
+      height: 75px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.2rem;
+      margin-bottom: 0.3rem;
+      background: #1a6dcc;
+      color: white;
+      border: 3px solid white;
+    }
+
+    .level-number {
+      position: absolute;
+      bottom: 10px;
+      background: #1a6dcc;
+      color: white;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1rem;
+      font-weight: bold;
+      border: 2px solid white;
+    }
+
+    .locked {
+      opacity: 0.7;
+      cursor: not-allowed;
+      border-color: #666;
+      background: #f0f0f0;
+    }
+
+    .locked .level-icon {
+      background: #666;
+    }
+
+    /* Позиционирование уровней как на скриншоте */
+    .level-1 {
+      bottom: 15%;
+      left: 12%;
+    }
+
+    .level-2 {
+      bottom: 35%;
+      left: 28%;
+    }
+
+    .level-3 {
+      bottom: 45%;
+      left: 48%;
+    }
+
+    .level-4 {
+      top: 18%;
+      right: 25%;
+    }
+
+    .level-5 {
+      top: 30%;
+      right: 12%;
+      border-color: #d4a574;
+    }
+
+    .level-5 .level-icon {
+      background: #d4a574;
+    }
+
+    .level-5 .level-number {
+      background: #d4a574;
+    }
+
+    /* Выбор уровня */
+    #level-select {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      position: relative;
+    }
+
+    .level-title {
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      color: white;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      font-weight: 700;
+      text-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    }
+
+    .level-show-card {
+      background: white;
+      border-radius: 25px;
+      overflow: hidden;
+      max-width: 550px;
+      width: 100%;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+      position: relative;
+      z-index: 2;
+      margin-bottom: 2rem;
+      border: 4px solid rgba(255,255,255,0.5);
+    }
+
+    .level-show-img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+    }
+
+    .level-show-content {
+      padding: 2.5rem;
+      text-align: center;
+    }
+
+    .level-show-content h3 {
+      font-size: 2.3rem;
+      margin-bottom: 2rem;
+      color: #1a6dcc;
+      font-weight: 700;
+    }
+
+    .btn-mode {
+      display: block;
+      width: 85%;
+      margin: 1rem auto;
+      padding: 1.2rem 2rem;
+      background: linear-gradient(135deg, #1a6dcc, #0d4a8a);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      box-shadow: 0 5px 15px rgba(26, 109, 204, 0.3);
+    }
+
+    .btn-mode:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(26, 109, 204, 0.5);
+    }
+
+    /* Сведения */
+    #info {
+      background: #f5e6c8;
+      position: relative;
+      padding: 4rem 2rem;
+    }
+
+    .info-wrapper {
+      max-width: 1200px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    .info-nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .info-nav-btn {
+      padding: 0.9rem 1.8rem;
+      background: #1a6dcc;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .info-nav-btn:hover, .info-nav-btn.active {
+      background: #0d4a8a;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(26, 109, 204, 0.4);
+    }
+
+    .info-container {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 25px;
+      padding: 3rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+
+    .info-section {
+      display: none;
+    }
+
+    .info-section.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .info-title {
+      font-size: 2.8rem;
+      text-align: center;
+      margin-bottom: 2.5rem;
+      color: #1a6dcc;
+      font-weight: 700;
+    }
+
+    .info-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-block {
+      margin-bottom: 2.5rem;
+    }
+
+    .info-block h3 {
+      font-size: 1.7rem;
+      margin-bottom: 1.2rem;
+      color: #1a6dcc;
+      font-weight: 600;
+    }
+
+    .info-image {
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      margin-bottom: 1.5rem;
+      border: 3px solid rgba(26, 109, 204, 0.2);
+    }
+
+    .info-image img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .info-image:hover img {
+      transform: scale(1.05);
+    }
+
+    .info-image-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .info-image-grid img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .info-text {
+      font-size: 1.15rem;
+      line-height: 1.9;
+      color: #333;
+    }
+
+    .info-text p {
+      margin-bottom: 1.2rem;
+    }
+
+    .place-card {
+      background: linear-gradient(135deg, #f9f9f9, #fff);
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      border: 2px solid rgba(26, 109, 204, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .place-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+
+    .place-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .place-card h4 {
+      color: #1a6dcc;
+      margin-bottom: 0.7rem;
+      font-size: 1.3rem;
+    }
+
+    .place-card p {
+      color: #666;
+      font-size: 1rem;
+    }
+
+    /* КВИЗ */
+#quiz {
+  background: url('img/fon_voprosov.png') center/cover no-repeat fixed;
+  position: relative;
+  padding: 3rem 2rem;
+}
+
+    .quiz-wrapper {
+      max-width: 950px;
+      width: 100%;
+      background: white;
+      border-radius: 25px;
+      padding: 3.5rem;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 2;
+      border: 3px solid rgba(26, 109, 204, 0.2);
+    }
+
+    .result-banner {
+      width: 100%;
+      padding: 1.8rem;
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 2.5rem;
+      border-radius: 15px;
+      display: none;
+      animation: slideDown 0.4s ease;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .correct-banner {
+      background: linear-gradient(135deg, #4caf50, #81c784);
+      color: white;
+      display: block;
+    }
+
+    .incorrect-banner {
+      background: linear-gradient(135deg, #f44336, #e57373);
+      color: white;
+      display: block;
+    }
+
+    .quiz-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .quiz-title {
+      font-size: 2rem;
+      margin-bottom: 1.2rem;
+      color: #0a192f;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      padding: 1.2rem;
+      border-radius: 12px;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .quiz-subtitle {
+      font-size: 1.3rem;
+      color: #1a6dcc;
+      font-weight: 600;
+    }
+
+    .answer-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem;
+      margin-top: 2.5rem;
+    }
+
+    .answer-btn {
+      padding: 1.8rem;
+      border-radius: 18px;
+      border: 3px solid #1a6dcc;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.15rem;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      background: white;
+      color: #0a192f;
+      font-weight: 600;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .answer-btn:hover:not(.disabled) {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(26, 109, 204, 0.35);
+    }
+
+    .answer-btn.correct {
+      border-color: #4caf50;
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+      color: #2e7d32;
+    }
+
+    .answer-btn.wrong {
+      border-color: #f44336;
+      background: linear-gradient(135deg, #ffebee, #ffcdd2);
+      color: #c62828;
+    }
+
+    .answer-btn.disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .answer-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #1a6dcc;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .answer-btn.correct .answer-number {
+      background: #4caf50;
+    }
+
+    .answer-btn.wrong .answer-number {
+      background: #f44336;
+    }
+
+    .controls {
+      margin-top: 3rem;
+      text-align: center;
+    }
+
+    .next-btn, .submit-btn {
+      padding: 1.3rem 3.5rem;
+      background: linear-gradient(135deg, #1a6dcc, #0d4a8a);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: none;
+      box-shadow: 0 5px 20px rgba(26, 109, 204, 0.4);
+    }
+
+    .next-btn:hover, .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(26, 109, 204, 0.6);
+    }
+
+    .next-btn.show, .submit-btn.show {
+      display: inline-block;
+    }
+
+    /* Результаты */
+    #results {
+      background: #f5e6c8;
+      position: relative;
+      padding: 4rem 2rem;
+    }
+
+    .results-container {
+      max-width: 750px;
+      width: 100%;
+      background: white;
+      border-radius: 25px;
+      padding: 3.5rem;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .results-title {
+      font-size: 2.8rem;
+      margin-bottom: 2.5rem;
+      color: #1a6dcc;
+      font-weight: 700;
+    }
+
+    .score-circle {
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: conic-gradient(#4caf50 0%, #4caf50 80%, #e0e0e0 80%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2.5rem auto;
+      position: relative;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+
+    .score-inner {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .score-value {
+      font-size: 4rem;
+      font-weight: 700;
+      color: #4caf50;
+    }
+
+    .results-message {
+      font-size: 2.3rem;
+      margin-bottom: 1.8rem;
+      color: #1a6dcc;
+      font-weight: 700;
+    }
+
+    .results-stats {
+      font-size: 1.5rem;
+      margin-bottom: 3rem;
+      color: #555;
+      font-weight: 600;
+    }
+
+    .btn-results {
+      padding: 1.2rem 3rem;
+      background: linear-gradient(135deg, #1a6dcc, #0d4a8a);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 0.7rem;
+      box-shadow: 0 5px 15px rgba(26, 109, 204, 0.3);
+    }
+
+    .btn-results:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(26, 109, 204, 0.5);
+    }
+
+    /* Кнопка назад */
+    .btn-back {
+      padding: 1rem 2.5rem;
+      background: transparent;
+      color: white;
+      border: 3px solid white;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 2rem;
+      z-index: 10;
+    }
+
+    .btn-back:hover {
+      background: white;
+      color: #1a6dcc;
+      transform: translateY(-2px);
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+      .hero-container {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .info-content {
+        grid-template-columns: 1fr;
+      }
+
+      .info-image-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .answer-container {
+        grid-template-columns: 1fr;
+      }
+
+      .quiz-wrapper {
+        padding: 2rem 1.5rem;
+      }
+
+      .result-banner {
+        font-size: 1.8rem;
+      }
+
+      .quiz-title {
+        font-size: 1.5rem;
+      }
+
+      .level-title {
+        font-size: 2rem;
+      }
+
+      /* Адаптивное позиционирование уровней на мобильных */
+      .level-card {
+        position: relative;
+        margin: 1rem auto;
+        bottom: auto !important;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+      }
+
+      .levels-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+        padding: 2rem 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ГЛАВНАЯ -->
+  <section id="home" class="active">
+    <div class="ornament-top"></div>
+    <div class="ornament-bottom"></div>
+    
+    <div class="hero-container">
+      <div class="boy-img">
+        <img src="img/balashka.png" alt="Мальчик-проводник">
+      </div>
+      <div class="text-bubble">
+        <h1>NomadGo — открой Кыргызстан по-новому.</h1>
+        <p>Необычные факты о самых интересных местах и короткие тесты, чтобы проверить себя. Узнай больше — путешествуй ярче. NomadGo вдохновляет открыть Кыргызстан своими глазами.</p>
+        <button class="btn-mode" onclick="showSection('map')" style="width: 100%; margin: 0;">НАЧАТЬ ПУТЕШЕСТВИЕ ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- КАРТА С УРОВНЯМИ -->
+  <section id="map">
+    <div class="ornament-top"></div>
+    <div class="ornament-bottom"></div>
+    
+    <h2 style="font-size: 2.8rem; margin-bottom: 2rem; text-align: center; color: white; position: relative; z-index: 2; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.3); margin-top: 2rem;">Выберите регион</h2>
+    
+    <div class="levels-container">
+      <!-- Уровень 1 - открыт -->
+      <div class="level-card level-1" onclick="showSection('level-select')">
+        <div class="level-icon">★</div>
+        <div class="level-number">1</div>
+      </div>
+      
+      <!-- Уровень 2 - закрыт -->
+      <div class="level-card level-2 locked">
+        <div class="level-icon">🔒</div>
+        <div class="level-number">2</div>
+      </div>
+      
+      <!-- Уровень 3 - закрыт -->
+      <div class="level-card level-3 locked">
+        <div class="level-icon">🔒</div>
+        <div class="level-number">3</div>
+      </div>
+      
+      <!-- Уровень 4 - закрыт -->
+      <div class="level-card level-4 locked">
+        <div class="level-icon">🔒</div>
+        <div class="level-number">4</div>
+      </div>
+      
+      <!-- Уровень 5 - закрыт (золотой) -->
+      <div class="level-card level-5 locked">
+        <div class="level-icon">🔒</div>
+        <div class="level-number">5</div>
+      </div>
+    </div>
+    
+    <button class="btn-back" onclick="showSection('home')">← Назад</button>
+  </section>
+
+  <!-- ВЫБОР РЕЖИМА -->
+  <section id="level-select">
+    <div class="ornament-top"></div>
+    <div class="ornament-bottom"></div>
+    
+    <h2 class="level-title">1 уровень</h2>
+    <div class="level-show-card">
+      <img src="img/1_fon_onvopros.png" alt="Иссык-Куль" class="level-show-img">
+      <div class="level-show-content">
+        <h3>Иссык-Куль</h3>
+        <button class="btn-mode" onclick="showInfo()">сведения</button>
+        <button class="btn-mode" onclick="startQuiz()">квест</button>
+      </div>
+    </div>
+    <button class="btn-back" onclick="showSection('map')">← Назад</button>
+  </section>
+
+  <!-- СВЕДЕНИЯ С НАВИГАЦИЕЙ -->
+  <section id="info">
+    <div class="ornament-top"></div>
+    <div class="ornament-bottom"></div>
+    
+    <div class="info-wrapper">
+      <div class="info-nav">
+        <button class="info-nav-btn active" onclick="showInfoSection('issyk', this)">Иссык-Куль</button>
+        <button class="info-nav-btn" onclick="showInfoSection('petroglifs', this)">Петроглифы</button>
+        <button class="info-nav-btn" onclick="showInfoSection('places', this)">Места отдыха</button>
+        <button class="info-nav-btn" onclick="showInfoSection('finds', this)">Находки</button>
+        <button class="info-nav-btn" onclick="showInfoSection('chigu', this)">Чигучэн</button>
+      </div>
+
+      <div class="info-container">
+        <!-- Иссык-Куль -->
+        <div id="issyk" class="info-section active">
+          <h2 class="info-title">Иссык-Куль</h2>
+          <div class="info-content">
+            <div class="info-block">
+              <div class="info-image">
+                <img src="img/iss_verh.png" alt="Иссык-Куль">
+              </div>
+            </div>
+            <div class="info-text">
+              <p><strong>Иссык-Куль</strong> — это большое соленое бессточное озеро. Оно расположено на высоте <strong>1608 метров</strong> над уровнем моря.</p>
+              <p>Название озера в переводе с кыргызского языка означает <strong>«горячее озеро»</strong>, поскольку озеро зимой не замерзает.</p>
+              <p>Длина береговой линии — <strong>688 км</strong>, максимальная глубина — <strong>668 м</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Петроглифы -->
+        <div id="petroglifs" class="info-section">
+          <h2 class="info-title">Петроглифы</h2>
+          <div class="info-content">
+            <div class="info-block">
+              <div class="info-image">
+                <img src="img/petrog_1.png" alt="Петроглифы">
+              </div>
+              <div class="info-text">
+                <p>В Чолпон-Ате находится популярный музей под открытым небом, который иногда называют <strong>Каменным садом</strong>.</p>
+                <p>В музее представлены доисторические монументальные изображения: кромлех, надгробные памятники, приграничные каменные ограды, а также петроглифы, датируемые <strong>2000 до н.э. – 4 веком н.э.</strong></p>
+              </div>
+            </div>
+            <div class="info-block">
+              <h3>Сака-Скифский стиль</h3>
+              <div class="info-image-grid">
+                <img src="img/last_1.png" alt="Петроглифы 1">
+                <img src="img/last_2.png" alt="Петроглифы 2">
+                <img src="img/last_3.png" alt="Петроглифы 3">
+                <img src="img/last_4.png" alt="Петроглифы 4">
+              </div>
+              <p>Многие из рисунков выполнены в <strong>Сака-Скифском стиле</strong>: изображения охотников, сцен охоты.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Места отдыха -->
+        <div id="places" class="info-section">
+          <h2 class="info-title">Места отдыха</h2>
+          <div class="info-content">
+            <div class="place-card">
+              <img src="img/ruhordo.png" alt="Рух Ордо">
+              <h4>Рух Ордо - культурный центр</h4>
+              <p>г. Чолпон-Ата</p>
+            </div>
+            <div class="place-card">
+              <img src="img/bosteri.png" alt="Бостери">
+              <h4>Бостери - село</h4>
+              <p>Иссык-Кульская область</p>
+            </div>
+            <div class="place-card">
+              <img src="img/radugaplus.png" alt="Радуга Плюс">
+              <h4>Радуга Плюс - центр отдыха</h4>
+              <p>село Сары Ой</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Находки -->
+        <div id="finds" class="info-section">
+          <h2 class="info-title">Находки</h2>
+          <div class="info-content">
+            <div class="info-block">
+              <div class="info-image">
+                <img src="img/find_1.png" alt="Развалины">
+              </div>
+              <p style="text-align: center; font-weight: 600; font-size: 1.2rem;">Развалины города</p>
+            </div>
+            <div class="info-block">
+              <div class="info-image">
+                <img src="img/find_2.png" alt="Осколки">
+              </div>
+              <p style="text-align: center; font-weight: 600; font-size: 1.2rem;">Осколки древней посуды</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Чигучэн -->
+        <div id="chigu" class="info-section">
+          <h2 class="info-title">Чигучэн</h2>
+          <div class="info-content">
+            <div class="info-block">
+              <div class="info-image">
+                <img src="img/chigu_1.png" alt="Чигу">
+              </div>
+              <div class="info-text">
+                <p><strong>Чигу ("Город красных камней")</strong> - античный город на дне Иссык-Куля - ставка верховного вождя усуней.</p>
+              </div>
+            </div>
+            <div class="info-block">
+              <div class="info-text">
+                <p>Считавшийся мифом затонувший город на дне Иссык-Куля оказался реальностью: дайверы нашли руины, а волны — артефакты. Исследования подтверждают наличие поселения, которое легенды связывают с замком, монастырем или сокровищами <strong>Чингисхана</strong>.</p>
+              </div>
+              <div class="info-image">
+                <img src="img/chigu_2.png" alt="Под водой">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-back" onclick="showSection('level-select')" style="color: #1a6dcc; border-color: #1a6dcc;">← Назад</button>
+    </div>
+  </section>
+
+  <!-- КВИЗ -->
+  <section id="quiz">
+    <div class="ornament-top"></div>
+    <div class="ornament-bottom"></div>
+    
+    <div class="quiz-wrapper">
+      <div id="result-banner" class="result-banner"></div>
+      
+      <div class="quiz-header">
+        <div class="quiz-title" id="question-text"></div>
+        <div class="quiz-subtitle" id="question-counter"></div>
+      </div>
+      
+      <div class="answer-container" id="answers-container"></div>
+      
+      <div class="controls">
+        <button class="submit-btn show" id="submit-btn" onclick="handleSubmit()">Ответить</button>
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">Далее →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- РЕЗУЛЬТАТЫ -->
+  <section id="results">
+    <div class="ornament-top"></div>
+    <div class="ornament-bottom"></div>
+    
+    <div class="results-container">
+      <h2 class="results-title">Ваши результаты</h2>
+      
+      <div class="score-circle" id="score-circle">
+        <div class="score-inner">
+          <div class="score-value" id="score-value">0%</div>
+        </div>
+      </div>
+      
+      <p class="results-message" id="results-message"></p>
+      <p class="results-stats" id="results-stats"></p>
+      
+      <button class="btn-results" onclick="restartQuiz()">Пройти снова</button>
+      <button class="btn-results" onclick="showSection('map')">К другим регионам</button>
+    </div>
+  </section>
+
+  <script>
+    // Данные для квиза - 10 вопросов
+    const quizData = [
+      {
+        question: "Что значит \"Иссык-Куль\"?",
+        answers: ["Соленое озеро", "Скрытое озеро", "Голубое озеро", "Горячее озеро"],
+        correct: 3
+      },
+      {
+        question: "На какой высоте расположен Иссык-Куль?",
+        answers: ["1200 м", "1608 м", "2000 м", "800 м"],
+        correct: 1
+      },
+      {
+        question: "Как называют музей петроглифов в Чолпон-Ате?",
+        answers: ["Каменный сад", "Горный парк", "Древний город", "Озерный музей"],
+        correct: 0
+      },
+      {
+        question: "В каком стиле выполнены многие петроглифы?",
+        answers: ["Тюркском", "Сака-Скифском", "Монгольском", "Китайском"],
+        correct: 1
+      },
+      {
+        question: "С кем легенды связывают Чигу?",
+        answers: ["Манас", "Барсбек", "Сейтек", "Чингисхан"],
+        correct: 3
+      },
+      {
+        question: "Что нашли дайверы на дне Иссык-Куля?",
+        answers: ["Затонувший корабль", "Руины города", "Сокровища", "Древний храм"],
+        correct: 1
+      },
+      {
+        question: "Какая максимальная глубина Иссык-Куля?",
+        answers: ["450 м", "668 м", "800 м", "320 м"],
+        correct: 1
+      },
+      {
+        question: "К какому периоду относятся петроглифы?",
+        answers: ["2000 до н.э. - 4 век н.э.", "1000 до н.э. - 1 век н.э.", "500 до н.э. - 10 век н.э.", "3000 до н.э. - 2 век н.э."],
+        correct: 0
+      },
+      {
+        question: "Что означает \"Чигу\"?",
+        answers: ["Город озеро", "Город красных камней", "Священное место", "Затонувший город"],
+        correct: 1
+      },
+      {
+        question: "Что изображено на петроглифах?",
+        answers: ["Только животных", "Охотников и сцены охоты", "Только людей", "Только растения"],
+        correct: 1
+      }
+    ];
+
+    let currentQuestion = 0;
+    let correctAnswers = 0;
+    let selectedAnswer = null;
+    let answered = false;
+
+    function showSection(sectionId) {
+      document.querySelectorAll('section').forEach(sec => {
+        sec.classList.remove('active');
+      });
+      document.getElementById(sectionId).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    // Навигация по сведениям
+    function showInfo() {
+      showSection('info');
+      document.querySelectorAll('.info-nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector('.info-nav-btn').classList.add('active');
+      showInfoSection('issyk', document.querySelector('.info-nav-btn'));
+    }
+
+    function showInfoSection(section, btn) {
+      document.querySelectorAll('.info-section').forEach(sec => {
+        sec.classList.remove('active');
+      });
+      
+      document.getElementById(section).classList.add('active');
+      
+      if (btn) {
+        document.querySelectorAll('.info-nav-btn').forEach(b => {
+          b.classList.remove('active');
+        });
+        btn.classList.add('active');
+      }
+      
+      window.scrollTo(0, 0);
+    }
+
+    function startQuiz() {
+      currentQuestion = 0;
+      correctAnswers = 0;
+      selectedAnswer = null;
+      answered = false;
+      
+      const banner = document.getElementById('result-banner');
+      banner.style.display = 'none';
+      banner.className = 'result-banner';
+      
+      showSection('quiz');
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      const q = quizData[currentQuestion];
+      
+      document.getElementById('question-text').textContent = q.question;
+      document.getElementById('question-counter').textContent = `Вопрос ${currentQuestion + 1} из ${quizData.length}`;
+      
+      const container = document.getElementById('answers-container');
+      container.innerHTML = '';
+      
+      q.answers.forEach((answer, index) => {
+        const btn = document.createElement('div');
+        btn.className = 'answer-btn';
+        btn.innerHTML = `
+          <span class="answer-number">${index + 1}</span>
+          <span>${answer}</span>
+        `;
+        btn.onclick = () => selectAnswer(index);
+        container.appendChild(btn);
+      });
+      
+      selectedAnswer = null;
+      answered = false;
+      
+      document.getElementById('submit-btn').classList.add('show');
+      document.getElementById('next-btn').classList.remove('show');
+      
+      const banner = document.getElementById('result-banner');
+      banner.style.display = 'none';
+      banner.className = 'result-banner';
+    }
+
+    function selectAnswer(index) {
+      if (answered) return;
+      
+      selectedAnswer = index;
+      
+      document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.classList.remove('correct', 'wrong');
+        btn.style.background = 'white';
+        btn.style.borderColor = '#1a6dcc';
+      });
+      
+      const buttons = document.querySelectorAll('.answer-btn');
+      buttons[index].style.background = '#e3f2fd';
+      buttons[index].style.borderColor = '#0d4a8a';
+    }
+
+    function handleSubmit() {
+      if (selectedAnswer === null) {
+        alert('Пожалуйста, выберите вариант ответа!');
+        return;
+      }
+      
+      answered = true;
+      const correctIndex = quizData[currentQuestion].correct;
+      const buttons = document.querySelectorAll('.answer-btn');
+      
+      buttons.forEach((btn, index) => {
+        btn.classList.add('disabled');
+        btn.onclick = null;
+        btn.style.background = 'white';
+        btn.style.borderColor = '#1a6dcc';
+        
+        if (index === correctIndex) {
+          btn.classList.add('correct');
+        }
+        if (index === selectedAnswer && index !== correctIndex) {
+          btn.classList.add('wrong');
+        }
+      });
+      
+      const banner = document.getElementById('result-banner');
+      if (selectedAnswer === correctIndex) {
+        correctAnswers++;
+        banner.textContent = 'Блестяще!!!';
+        banner.className = 'result-banner correct-banner';
+      } else {
+        banner.textContent = 'Неверно!!!';
+        banner.className = 'result-banner incorrect-banner';
+      }
+      
+      document.getElementById('submit-btn').classList.remove('show');
+      document.getElementById('next-btn').classList.add('show');
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      const total = quizData.length;
+      const percentage = Math.round((correctAnswers / total) * 100);
+      
+      const circle = document.getElementById('score-circle');
+      circle.style.background = `conic-gradient(#4caf50 0%, #4caf50 ${percentage}%, #e0e0e0 ${percentage}%)`;
+      
+      document.getElementById('score-value').textContent = `${percentage}%`;
+      
+      let message = '';
+      if (percentage === 100) message = 'Великолепно!!!';
+      else if (percentage >= 80) message = 'Отлично!!!';
+      else if (percentage >= 60) message = 'Хорошо!';
+      else message = 'Можно лучше!';
+      
+      document.getElementById('results-message').textContent = message;
+      document.getElementById('results-stats').textContent = 
+        `Правильных ответов: ${correctAnswers} из ${total}`;
+      
+      showSection('results');
+    }
+
+    function restartQuiz() {
+      startQuiz();
+    }
+  </script>
+</body>
+</html>
